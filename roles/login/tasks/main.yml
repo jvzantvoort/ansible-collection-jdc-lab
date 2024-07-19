@@ -1,0 +1,39 @@
+---
+################################################################################
+# Setup tasks
+################################################################################
+# Setup/install tasks.
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+################################################################################
+# Tasks
+################################################################################
+
+- name: Change the password expiration time from undefined to 90 days
+  lineinfile:
+    dest=/etc/login.defs
+    regexp=^PASS_MAX_DAYS
+    line='PASS_MAX_DAYS 90'
+  notify:
+    - chage root
+
+- name: Ensure that the user cannot change their password more than once a day
+  lineinfile:
+    dest=/etc/login.defs
+    regexp=^PASS_MIN_DAYS
+    line='PASS_MIN_DAYS 1'
+
+- name: Make the user waits four seconds if they fail after LOGIN_RETRIES
+  lineinfile:
+    dest=/etc/login.defs
+    regexp=^FAIL_DELAY
+    line='FAIL_DELAY 4'
+
+- name: set some default histfile options
+  copy:
+    src=history.sh
+    dest=/etc/profile.d/history.sh
+    owner=root
+    group=root
+    mode=0755

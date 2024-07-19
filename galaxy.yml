@@ -1,0 +1,18 @@
+---
+namespace: jdc
+name: lab
+version: 1.0.0
+readme: README.md
+authors:
+  - John van Zantvoort <john@vanzantvoort.org>
+description: Some roles and plugins to manage a libvirt based lab
+license:
+  - MIT License
+license_file: LICENSE
+tags: []
+dependencies: {}
+repository: https://github.com/jvzantvoort/ansible-collection-jdc-lab.git
+documentation: https://github.com/jvzantvoort/ansible-collection-jdc-lab
+homepage: https://github.com/jvzantvoort/ansible-collection-jdc-lab
+issues: https://github.com/jvzantvoort/ansible-collection-jdc-lab/issues
+build_ignore: []

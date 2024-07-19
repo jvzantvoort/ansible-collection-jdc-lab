@@ -1,0 +1,6 @@
+ansible-compat
+ansible-core
+ansible-lint
+flake8
+molecule
+yamllint

@@ -1,0 +1,23 @@
+---
+- name: Test Playbook
+  hosts: all
+  tasks:
+    - name: Create a directory
+      file:
+        path: /mnt/test_directory
+        state: directory
+        mode: '0777'
+
+
+    - name: Mount a filesystem
+      mount:
+        path: /mnt/test_directory
+        src: /dev/sdb1
+        fstype: ext4
+        state: mounted
+
+    - name: Create a symbolic link
+      file:
+        src: /mnt/test_directory
+        dest: /mnt/test_link
+        state: link

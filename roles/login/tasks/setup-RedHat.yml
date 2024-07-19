@@ -1,0 +1,17 @@
+---
+
+- name: Fix bash default prompt anoyance
+  copy:
+    src: bash-prompt-default
+    dest: /etc/sysconfig/bash-prompt-default
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Fix bash screen prompt anoyance
+  copy:
+    src: bash-prompt-screen
+    dest: /etc/sysconfig/bash-prompt-screen
+    owner: root
+    group: root
+    mode: 0755

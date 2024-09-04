@@ -1,0 +1,82 @@
+---
+
+- name: Check variables
+  block:
+
+    - name: test if storage_parted is set correctly
+      ansible.builtin.assert:
+        that: storage_parted is defined
+        quiet: yes
+        success_msg: "storage_parted is defined"
+        fail_msg: "storage_parted is not defined"
+
+    - name: test if storage_lvg is set correctly
+      ansible.builtin.assert:
+        that: storage_lvg is defined
+        quiet: yes
+        success_msg: "storage_lvg is defined"
+        fail_msg: "storage_lvg is not defined"
+
+    - name: test if storage_lvol is set correctly
+      ansible.builtin.assert:
+        that: storage_lvol is defined
+        quiet: yes
+        success_msg: "storage_lvol is defined"
+        fail_msg: "storage_lvol is not defined"
+
+- name: Check variables
+  become: true
+  block:
+
+    - name: Create a lvm device partition
+      community.general.parted:
+        device: "{{ item.device }}"
+        number: "{{ item.number }}"
+        flags: "{{ item.flags }}"
+        part_end: "{{ item.part_end }}"
+        state: present
+      loop: "{{ storage_parted }}"
+      loop_control:
+        label: "{{ item.device }}"
+
+    - name: Create volume group
+      community.general.lvg:
+        vg: "{{ item.vg }}"
+        pvs: "{{ item.pvs }}"
+      loop: "{{ storage_lvg }}"
+      loop_control:
+        label: "{{ item.vg }}"
+
+
+- name: Create LVS
+  become: true
+  block:
+
+    - name: Create a logical volume
+      community.general.lvol:
+        vg: "{{ item.vg }}"
+        lv: "{{ item.lv }}"
+        size: "{{ item.size }}"
+        state: present
+        shrink: false
+      loop: "{{ storage_lvol }}"
+      loop_control:
+        label: "{{ item.vg }}/{{ item.lv }}"
+
+    - name: Create filesystem
+      filesystem:
+         fstype: "{{ item.fstype }}"
+         dev: "/dev/mapper/{{ item.vg }}-{{ item.lv }}"
+      loop: "{{ storage_lvol }}"
+      loop_control:
+        label: "{{ item.vg }}/{{ item.lv }}"
+
+    - name: Mount the filesystem
+      mount:
+        fstype: "{{ item.fstype }}"
+        src: "/dev/mapper/{{ item.vg }}-{{ item.lv }}"
+        path: "{{ item.mount_path }}"
+        state: mounted
+      loop: "{{ storage_lvol }}"
+      loop_control:
+        label: "{{ item.vg }}/{{ item.lv }} {{ item.mount_path }}"

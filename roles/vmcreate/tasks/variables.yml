@@ -1,0 +1,85 @@
+---
+- name: Get pool paths
+  become: true
+  block:
+
+    - name: List available pools
+      community.libvirt.virt_pool:
+        command: info
+        uri: "{{ vmcreate_uri }}"
+      register: storage_pools
+
+    - name: Set pool
+      ansible.builtin.set_fact:
+        storage_pool_path: "{{ storage_pools.pools[vmcreate_pool].path }}"
+
+    - name: Generate a mac address
+      ansible.builtin.set_fact:
+        mac: "{{ vmcreate_mac_start | community.general.random_mac }}"
+
+    - name: Print mac facts
+      ansible.builtin.debug:
+        msg: "mac: {{ mac }}"
+
+    - name: Print storage_pool_path facts
+      ansible.builtin.debug:
+        msg: "storage_pool_path: {{ storage_pool_path }}"
+
+- name: Get source paths
+  become: true
+  block:
+
+    - name: Set template path from defaults
+      ansible.builtin.set_fact:
+        template_path: "{{ storage_pool_path }}/{{ vmcreate_template_subdir }}/{{ vmcreate_template_name }}"
+      when:
+        - (vmcreate_template_path is not defined) or (vmcreate_template_path|length == 0)
+
+    - name: Set template path from provided input
+      ansible.builtin.set_fact:
+        template_path: "{{ vmcreate_template_path }}"
+      when:
+        - (vmcreate_template_path is defined) and (vmcreate_template_path|length != 0)
+
+    - name: Print template_path facts
+      ansible.builtin.debug:
+        msg: "template_path: {{ template_path }}"
+
+- name: Get destination paths
+  become: true
+  block:
+
+    - name: Set template path from defaults
+      ansible.builtin.set_fact:
+        image_path: "{{ storage_pool_path }}/{{ vmcreate_image_name }}"
+      when:
+        - (vmcreate_image_path is not defined) or (vmcreate_image_path|length == 0)
+        - vmcreate_image_name|length != 0
+
+    - name: Set template path from provided input
+      ansible.builtin.set_fact:
+        image_path: "{{ vmcreate_image_path }}"
+      when:
+        - (vmcreate_image_path is defined) and (vmcreate_image_path|length != 0)
+
+    - name: Print image_path facts
+      ansible.builtin.debug:
+        msg: "image_path: {{ image_path }}"
+
+- name: Validate parameters
+  become: true
+  block:
+
+    - name: Validate arguments
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ vmcreate_required_data }}"
+
+    - name: Ensure variables are non empty
+      ansible.builtin.assert:
+        that:
+          - image_path is defined
+          - image_path|length != 0
+        success_msg: "image path is defined and not empty"
+        fail_msg: "image path is not defined or empty"
+
+...

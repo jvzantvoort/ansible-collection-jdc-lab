@@ -1,0 +1,10 @@
+---
+vmcreate_required_data:
+  image_path:
+    description: Path to the destination image
+    type: str
+    required: true
+  template_path:
+    description: Path to the source template
+    type: str
+    required: true

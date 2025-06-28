@@ -1,0 +1,36 @@
+---
+- name: Create the machine
+  when: not image_exists
+  become: true
+  block:
+
+    - name: Copy template image
+      copy:
+        src: "{{ template_path }}"
+        dest: "{{ image_path }}"
+        remote_src: true
+      register: template_copy
+
+    - name: Define the virtual machine
+      community.libvirt.virt:
+        command: define
+        xml: "{{ lookup('template', 'template.xml.j2') }}"
+      register: vm_result
+
+- name: Start the machine
+  become: true
+  block:
+
+    - name: Start the virtual machine
+      community.libvirt.virt:
+        name: "{{ vmcreate_image_name }}"
+        state: running
+        command: start
+      when: vm_result.changed
+
+      #    - name: Wait for the VM's IP address using virsh domifaddr
+      #      shell: "virsh domifaddr {{ vmcreate_image_name }} --source agent | awk '!/lo/ && /ipv4/ {print $4}' | cut -d/ -f1"
+      #      register: vm_ip
+      #      retries: 20
+      #      delay: 5
+      #      until: vm_ip.stdout != ""

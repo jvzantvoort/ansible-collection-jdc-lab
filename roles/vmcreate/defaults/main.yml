@@ -1,0 +1,15 @@
+---
+vmcreate_enable: true
+vmcreate_pool: "default"
+vmcreate_uri: "qemu:///system"
+vmcreate_template_subdir: "templates"
+vmcreate_template_name: "Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
+vmcreate_template_path: ""
+vmcreate_image_name: ""
+vmcreate_image_path: ""
+vmcreate_image_memory_kb: 2097152
+# vmcreate_image_machine_type: "pc-i440fx-rhel7.6.0"
+vmcreate_image_machine_type: "q35"
+vmcreate_mac_start: "52:54:00"
+vmcreate_network: "prod"
+...

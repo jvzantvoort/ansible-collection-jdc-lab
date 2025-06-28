@@ -1,0 +1,19 @@
+---
+- name: Check existence of vm
+  become: true
+  block:
+    - name: Define the virtual machine
+      community.libvirt.virt:
+        command: list_vms
+      register: list_vms_result
+
+    - name: Set image_exists default
+      ansible.builtin.set_fact:
+        image_exists: false
+
+    - name: Set image_exists to current
+      ansible.builtin.set_fact:
+        image_exists: true
+      when: vmcreate_image_name in list_vms_result.list_vms
+
+

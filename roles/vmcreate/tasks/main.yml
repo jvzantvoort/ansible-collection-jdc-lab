@@ -1,0 +1,24 @@
+---
+# Ensure we are running on RedHat
+# --------------------------------------
+- name: Fail if non-RHEL
+  ansible.builtin.assert:
+    that: ansible_os_family == "RedHat"
+    fail_msg: "Role only supports RHEL OS"
+    quiet: true
+# --------------------------------------
+#
+
+- name: Invoke the role, if enabled
+  ansible.builtin.include_tasks:
+    file: variables.yml
+
+- name: Invoke the role, if enabled
+  when: vmcreate_enable|bool
+  ansible.builtin.include_tasks:
+    file: exists.yml
+
+- name: Invoke the role, if enabled
+  when: vmcreate_enable|bool
+  ansible.builtin.include_tasks:
+    file: create.yml
